@@ -15,7 +15,7 @@ public class KeywordsSearcherApplication {
         ConsoleHelper.writeHeader();
         while (true) {
             String path = ConsoleHelper.readString();
-            if(path.equals("exit")) {
+            if("exit".equals(path)) {
                 break;
             }
             try {

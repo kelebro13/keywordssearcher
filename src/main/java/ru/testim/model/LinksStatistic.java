@@ -6,8 +6,6 @@ public class LinksStatistic {
 
     private Map<String, Integer> links;
 
-    public LinksStatistic(){}
-
     public Map<String, Integer> getLinks() {
         return links;
     }

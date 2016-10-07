@@ -7,8 +7,6 @@ public class KeywordList {
 
     private Set<String> keywords;
 
-    public KeywordList(){}
-
     public Set<String> getKeywords() {
         return keywords;
     }

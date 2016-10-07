@@ -1,5 +1,7 @@
 # Keywords Searcher Application
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/18e358ed9b7b47f9b8fe1506b5efe65a)](https://www.codacy.com/app/tgumerov/keywordssearcher?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kelebro13/keywordssearcher&amp;utm_campaign=Badge_Grade)
+
 [Тестовое задание](task.md)
 
 ### Установка
