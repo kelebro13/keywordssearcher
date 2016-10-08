@@ -2,6 +2,8 @@ package ru.testim;
 
 
 import org.apache.any23.encoding.TikaEncodingDetector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.testim.exception.KeywordWrongException;
 import ru.testim.model.KeywordList;
 
@@ -14,6 +16,7 @@ import java.util.regex.Pattern;
 
 public class FileInputKeyword {
 
+    private static final Logger LOG = LoggerFactory.getLogger(FileInputStream.class);
     private static final String REGEXP = "[А-я\\w]+";
     private static Pattern pattern = Pattern.compile(REGEXP);
 
@@ -33,6 +36,7 @@ public class FileInputKeyword {
             if (matcher.matches()) {
                 keywordSet.add(line);
             } else {
+                LOG.debug(String.format("Файл %s содержит неверные данные", filePath));
                 throw new KeywordWrongException("Файл содержит неверные данные");
             }
         }

@@ -12,26 +12,47 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <junit.version>4.12</junit.version>
+        <httpclient.version>4.5.2</httpclient.version>
+        <encodingdetect.version>1.1</encodingdetect.version>
+        <slf4j.version>1.7.21</slf4j.version>
+        <logback.vesion>1.1.7</logback.vesion>
     </properties>
 
     <dependencies>
+        <!--Logging-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.vesion}</version>
+        </dependency>
         <!--HTTP Client-->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.2</version>
+            <version>${httpclient.version}</version>
         </dependency>
         <!--File Encoding Detector-->
         <dependency>
             <groupId>org.apache.any23</groupId>
             <artifactId>apache-any23-encoding</artifactId>
-            <version>1.1</version>
+            <version>${encodingdetect.version}</version>
         </dependency>
         <!--Test-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

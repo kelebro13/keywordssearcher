@@ -7,6 +7,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -24,9 +26,8 @@ import java.util.*;
 
 public class SearcherLink {
 
-
+    private static final Logger LOG = LoggerFactory.getLogger(SearcherLink.class);
     private static final String URL_FORMAT = "http://blogs.yandex.ru/search.rss?text=%s&numdoc=%s";
-
     private static int numdoc = 10;
 
     private SearcherLink(){}
@@ -103,7 +104,10 @@ public class SearcherLink {
     }
 
     public static void setNumdoc(int numdoc) {
-        if(numdoc <= 0) throw new IllegalArgumentException("значение numdoc должно быть положительным");
+        if(numdoc <= 0){
+            LOG.debug("значение numdoc должно быть положительным");
+            throw new IllegalArgumentException("значение numdoc должно быть положительным");
+        }
         SearcherLink.numdoc = numdoc;
     }
 }
