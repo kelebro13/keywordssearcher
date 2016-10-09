@@ -13,8 +13,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import ru.testim.model.KeywordList;
-import ru.testim.model.LinksStatistic;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,15 +20,32 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-public class SearcherLink {
+public class YandexApiSearcher {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SearcherLink.class);
+    private static final Logger LOG = LoggerFactory.getLogger(YandexApiSearcher.class);
     private static final String URL_FORMAT = "http://blogs.yandex.ru/search.rss?text=%s&numdoc=%s";
+    private static DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     private static int numdoc = 10;
 
-    private SearcherLink(){}
+    private YandexApiSearcher(){}
+
+
+    public static Map<String, Integer> getLinksStatistics(Set<String> keywordsSet) throws IOException{
+
+        Set<String> links = new HashSet<>();
+        for (String keyword : keywordsSet) {
+            Document document = getDocument(keyword);
+            links.addAll(getLinks(document));
+        }
+
+        Map<String, Integer> linkStatistics = getLinksCount(links);
+        return linkStatistics;
+    }
 
     public static Document getDocument(String keyword) throws IOException {
 
@@ -38,14 +53,11 @@ public class SearcherLink {
 
         HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
         HttpUriRequest request = new HttpGet(url);
-
         HttpResponse response = client.execute(request);
         int statusCode = response.getStatusLine().getStatusCode();
-
         Document document = null;
         if (statusCode == 200) {
             HttpEntity entity = response.getEntity();
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             try {
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 document = builder.parse(entity.getContent());
@@ -68,19 +80,6 @@ public class SearcherLink {
         return links;
     }
 
-    public static LinksStatistic getLinksStatistics(KeywordList keywords) throws IOException{
-
-        LinksStatistic linksStatistic = new LinksStatistic();
-
-        Set<String> links = new HashSet<>();
-        for (String keyword : keywords.getKeywords()) {
-            Document document = getDocument(keyword);
-            links.addAll(getLinks(document));
-        }
-
-        linksStatistic.setLinks(getLinksCount(links));
-        return linksStatistic;
-    }
 
     public static Map<String, Integer> getLinksCount(Set<String> links) throws MalformedURLException {
         Map<String, Integer> linksStatistics = new HashMap<>();
@@ -89,12 +88,7 @@ public class SearcherLink {
             url = new URL(link);
             String domain = url.getHost();
             domain = (domain.startsWith("www.") ? domain.substring(4) : domain);
-            if (linksStatistics.containsKey(domain)) {
-                int count = linksStatistics.get(domain);
-                linksStatistics.put(domain, count + 1);
-            } else {
-                linksStatistics.put(domain, 1);
-            }
+            linksStatistics.merge(domain, 1, (oldValue, newValue) -> newValue = oldValue + 1);
         }
         return linksStatistics;
     }
@@ -108,6 +102,6 @@ public class SearcherLink {
             LOG.debug("значение numdoc должно быть положительным");
             throw new IllegalArgumentException("значение numdoc должно быть положительным");
         }
-        SearcherLink.numdoc = numdoc;
+        YandexApiSearcher.numdoc = numdoc;
     }
 }

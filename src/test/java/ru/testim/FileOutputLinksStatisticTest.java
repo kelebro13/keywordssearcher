@@ -1,13 +1,13 @@
 package ru.testim;
 
 import org.junit.Test;
-import ru.testim.model.LinksStatistic;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -18,8 +18,7 @@ public class FileOutputLinksStatisticTest {
 
     @Test
     public void testSaveLinksStatistics() throws Exception {
-        LinksStatistic links = new LinksStatistic();
-        links.setLinks(liksStatisticsTestMap);
+        Map<String, Integer> links = liksStatisticsTestMap;
         FileOutputLinksStatistic.saveLinksStatistics(links);
 
         List<String> actual = new ArrayList<>();

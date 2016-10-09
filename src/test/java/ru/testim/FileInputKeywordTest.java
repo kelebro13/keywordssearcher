@@ -1,14 +1,13 @@
 package ru.testim;
 
 import org.junit.Test;
-import ru.testim.exception.KeywordWrongException;
-import ru.testim.model.KeywordList;
 
 import java.io.FileNotFoundException;
+import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static ru.testim.FileInputKeyword.getKeywords;
-import static ru.testim.datatest.KeywordsDataTest.*;
+import static ru.testim.datatest.KeywordsDataTest.keywordsTestSet;
 
 
 public class FileInputKeywordTest {
@@ -16,14 +15,14 @@ public class FileInputKeywordTest {
 
     @Test
     public void testGetKeywordsFileUtf8() throws Exception {
-        KeywordList keywords = getKeywords("testfile\\KeywordsTest_Utf8.txt");
-        assertEquals(keywordsTestSet, keywords.getKeywords());
+        Set<String> keywords = getKeywords("testfile\\KeywordsTest_Utf8.txt");
+        assertArrayEquals(keywordsTestSet.toArray(), keywords.toArray());
     }
 
     @Test
     public void testGetKeywordsFileWindows1251() throws Exception {
-        KeywordList keywords = getKeywords("testfile\\KeywordsTest_windows_1251.txt");
-        assertEquals(keywordsTestSet, keywords.getKeywords());
+        Set<String> keywords = getKeywords("testfile\\KeywordsTest_windows_1251.txt");
+        assertArrayEquals(keywordsTestSet.toArray(), keywords.toArray());
     }
 
     @Test(expected = FileNotFoundException.class)
@@ -31,7 +30,7 @@ public class FileInputKeywordTest {
        getKeywords("testfile\\KeywordsTest_not_file.txt");
     }
 
-    @Test(expected = KeywordWrongException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testGetKeywordsWrong() throws Exception {
         getKeywords("testfile\\KeywordsTest_wrong.txt");
     }

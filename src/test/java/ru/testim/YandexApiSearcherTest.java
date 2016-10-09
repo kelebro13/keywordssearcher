@@ -4,8 +4,6 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import ru.testim.datatest.KeywordsDataTest;
-import ru.testim.model.KeywordList;
-import ru.testim.model.LinksStatistic;
 
 import java.util.Map;
 import java.util.Set;
@@ -15,11 +13,11 @@ import static ru.testim.datatest.LinksStatisticsDataTest.liksStatisticsTestMap;
 import static ru.testim.datatest.SearcherDataTest.*;
 
 
-public class SearcherLinkTest {
+public class YandexApiSearcherTest {
 
     @Test
     public void testGetDocument() throws Exception {
-        Document document = SearcherLink.getDocument("java");
+        Document document = YandexApiSearcher.getDocument("java");
 
         Node generator  = document.getElementsByTagName("generator").item(0);
         Node description  = document.getElementsByTagName("description").item(0);
@@ -33,36 +31,29 @@ public class SearcherLinkTest {
 
     @Test
     public void testGetLinks() throws Exception {
-        Set<String> actual = SearcherLink.getLinks(getTestDocument());
+        Set<String> actual = YandexApiSearcher.getLinks(getTestDocument());
         assertEquals(4, actual.size());
         assertEquals(linksTestSet, actual);
     }
 
     @Test
     public void testGetLinksStatistics() throws Exception {
-        KeywordList keywords = new KeywordList();
-        keywords.setKeywords(KeywordsDataTest.keywordsTestSet);
+        Set<String> keywords = KeywordsDataTest.keywordsTestSet;
 
-        LinksStatistic actual = SearcherLink.getLinksStatistics(keywords);
+        Map<String, Integer> actual = YandexApiSearcher.getLinksStatistics(keywords);
 
         assertEquals(false, actual.isEmpty());
     }
 
     @Test
     public void testGetLinksCount() throws Exception {
-        Map<String, Integer> actual = SearcherLink.getLinksCount(linksTestSet);
+        Map<String, Integer> actual = YandexApiSearcher.getLinksCount(linksTestSet);
         assertEquals(liksStatisticsTestMap, actual);
-    }
-
-    @Test
-    public void getNumdoc() throws Exception {
-        int actual = SearcherLink.getNumdoc();
-        assertEquals(10, actual);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testSetNumdocNegativeNumber() throws Exception {
-        SearcherLink.setNumdoc(-1);
+        YandexApiSearcher.setNumdoc(-1);
     }
 
 }

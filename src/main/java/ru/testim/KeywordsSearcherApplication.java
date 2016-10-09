@@ -3,11 +3,11 @@ package ru.testim;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.testim.model.KeywordList;
-import ru.testim.model.LinksStatistic;
 import ru.testim.util.ConsoleHelper;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 public class KeywordsSearcherApplication {
 
@@ -22,16 +22,16 @@ public class KeywordsSearcherApplication {
                 break;
             }
             try {
-                KeywordList keywords = FileInputKeyword.getKeywords(path);
+                Set<String> keywords = FileInputKeyword.getKeywords(path);
                 if (keywords.isEmpty()) {
                     LOG.debug(String.format("Файл %s не содержит ключевых слов", path));
                     ConsoleHelper.writeMessage("Файл не содержит ключевых слов. Выберите другой файл.");
                     continue;
                 }
                 ConsoleHelper.writeMessage("Запуск поиска ссылов...");
-                LinksStatistic linksStatistic = SearcherLink.getLinksStatistics(keywords);
+                Map<String, Integer> linksStatistic = YandexApiSearcher.getLinksStatistics(keywords);
                 if(linksStatistic.isEmpty()){
-                    LOG.debug(String.format("Ссылок по данным ключевым словам s не найдено.", keywords.getKeywords().toString()));
+                    LOG.debug(String.format("Ссылок по данным ключевым словам s не найдено.", keywords.toString()));
                     ConsoleHelper.writeMessage("Ссылок по данным ключевым словам не найдено.");
                     break;
                 }
