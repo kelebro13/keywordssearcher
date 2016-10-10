@@ -6,8 +6,14 @@ import org.slf4j.LoggerFactory;
 import ru.testim.util.ConsoleHelper;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class KeywordsSearcherApplication {
 
@@ -35,7 +41,7 @@ public class KeywordsSearcherApplication {
                     ConsoleHelper.writeMessage("Ссылок по данным ключевым словам не найдено.");
                     break;
                 }
-                FileOutputLinksStatistic.saveLinksStatistics(linksStatistic);
+                saveLinksStatistics(linksStatistic);
                 ConsoleHelper.writeMessage("Поиск завершен.");
                 break;
             } catch (Exception e) {
@@ -43,5 +49,12 @@ public class KeywordsSearcherApplication {
             }
             ConsoleHelper.writeMessage("Повторите операцию:");
         }
+    }
+
+    public static void saveLinksStatistics(Map<String, Integer> linksStatistic) throws IOException{
+
+        List<String> outputDate = linksStatistic.entrySet().stream().map(pair -> pair.getKey() + " = " + pair.getValue()).collect(Collectors.toList());
+        Path file = Paths.get("LinksStatistic.txt");
+        Files.write(file, outputDate, Charset.forName("UTF-8"));
     }
 }
