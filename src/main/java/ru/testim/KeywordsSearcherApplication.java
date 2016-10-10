@@ -1,15 +1,18 @@
 package ru.testim;
 
 
+import org.apache.any23.encoding.TikaEncodingDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.testim.util.ConsoleHelper;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 public class KeywordsSearcherApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeywordsSearcherApplication.class);
+    private static final String REGEXP = "[А-я\\w]+";
 
     public static void main(String[] args) throws IOException{
 
@@ -28,7 +32,7 @@ public class KeywordsSearcherApplication {
                 break;
             }
             try {
-                Set<String> keywords = FileInputKeyword.getKeywords(path);
+                Set<String> keywords = getKeywordsFromFile(path);
                 if (keywords.isEmpty()) {
                     LOG.debug(String.format("Файл %s не содержит ключевых слов", path));
                     ConsoleHelper.writeMessage("Файл не содержит ключевых слов. Выберите другой файл.");
@@ -49,6 +53,18 @@ public class KeywordsSearcherApplication {
             }
             ConsoleHelper.writeMessage("Повторите операцию:");
         }
+    }
+
+    public static Set<String> getKeywordsFromFile(String filePath) throws IOException, IllegalArgumentException {
+
+        Charset charset = Charset.forName(new TikaEncodingDetector().guessEncoding(new FileInputStream(filePath)));
+        Set<String> keywordSet = Files.lines(Paths.get(filePath), charset).collect(Collectors.toCollection(HashSet::new));
+
+        if(!keywordSet.stream().allMatch(s -> s.matches(REGEXP))){
+            LOG.debug(String.format("Файл %s содержит неверные данные", filePath));
+            throw new IllegalArgumentException("Файл содержит неверные данные");
+        }
+        return keywordSet;
     }
 
     public static void saveLinksStatistics(Map<String, Integer> linksStatistic) throws IOException{
