@@ -34,16 +34,14 @@ public class YandexApiSearcher {
     private Queue<String> keywords = new ConcurrentLinkedQueue<>();
     private static Set<String> links = new CopyOnWriteArraySet<>(); // все ссылки по ключевым словам
 
-
-
-    public Map<String, Integer> getLinksStatistics(Set<String> keywordsSet) throws IOException{
+    public Map<String, Integer> getLinksStatistics(Set<String> keywordsSet) throws IOException {
 
         keywords = keywordsSet.stream().collect(Collectors.toCollection(ConcurrentLinkedQueue::new)); // все ключевые слова
         ExecutorService service = Executors.newFixedThreadPool(5);
 
         while (keywords.size() != 0) {
             try {
-                links.addAll((Set<String>)service.submit(new LinkSearcher()).get());
+                links.addAll((Set<String>) service.submit(new LinkSearcher()).get());
             } catch (InterruptedException e) {
                 LOG.debug(e.getLocalizedMessage());
             } catch (ExecutionException e) {
@@ -55,12 +53,17 @@ public class YandexApiSearcher {
         while (!service.isShutdown()) {
             //wait
         }
-        Map<String, Integer> linkStatistics  = getLinksCount(links);
+        Map<String, Integer> linkStatistics = getLinksCount(links);
         return linkStatistics;
     }
 
 
     public Map<String, Integer> getLinksCount(Set<String> links) throws MalformedURLException {
+
+        if (links.size() == 0) {
+            return Collections.emptyMap();
+        }
+
         Map<String, Integer> linksStatistics = new HashMap<>();
         URL url;
         for (String link : links) {
@@ -77,7 +80,7 @@ public class YandexApiSearcher {
     }
 
     public void setNumdoc(int numdoc) {
-        if(numdoc <= 0){
+        if (numdoc <= 0) {
             LOG.debug("значение numdoc должно быть положительным");
             throw new IllegalArgumentException("значение numdoc должно быть положительным");
         }
@@ -85,6 +88,8 @@ public class YandexApiSearcher {
     }
 
     public class LinkSearcher implements Callable {
+
+
         @Override
         public Set<String> call() throws Exception {
             Set<String> links = new HashSet<>();
@@ -98,8 +103,10 @@ public class YandexApiSearcher {
         public Document getDocument(String keyword) {
 
             String url = String.format(URL_FORMAT, keyword, numdoc);
-
-            HttpClient client = HttpClientBuilder.create().disableCookieManagement().build();
+            HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+            clientBuilder.disableCookieManagement();
+            // TODO: 17.10.2016 если есть прокси сервер - нужно настроить
+            HttpClient client = clientBuilder.build();
             HttpUriRequest request = new HttpGet(url);
             HttpResponse response;
             Document document = null;
@@ -125,7 +132,7 @@ public class YandexApiSearcher {
                 } catch (SAXException e) {
                     LOG.debug(e.getLocalizedMessage());
                 }
-            }else {
+            } else {
                 LOG.debug("Сервер вернул код ошибки= " + statusCode);
             }
             return document;

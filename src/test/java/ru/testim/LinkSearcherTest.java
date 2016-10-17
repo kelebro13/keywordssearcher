@@ -37,6 +37,15 @@ public class LinkSearcherTest {
     }
 
     @Test
+    public void testGetLinksIfDocumentNotHaveNeedTag() throws Exception {
+        YandexApiSearcher yandexApiSearcher = new YandexApiSearcher();
+        YandexApiSearcher.LinkSearcher searcher = yandexApiSearcher.new LinkSearcher();
+        Set<String> actual = searcher.getLinks(getTestWrongDocument());
+        assertEquals(0, actual.size());
+        assertEquals(Collections.emptySet(), actual);
+    }
+
+    @Test
     public void testGetLinksFromEmptySet() throws Exception {
         YandexApiSearcher yandexApiSearcher = new YandexApiSearcher();
         YandexApiSearcher.LinkSearcher searcher = yandexApiSearcher.new LinkSearcher();

@@ -74,5 +74,23 @@ public class SearcherDataTest {
 
     }
 
+    public static Document getTestWrongDocument() throws Exception{
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = factory.newDocumentBuilder();
+        Document doc = docBuilder.newDocument();
+        Element root = doc.createElement("rss");
+        doc.appendChild(root);
+
+        Element parent = doc.createElement("noitem");
+        root.appendChild(parent);
+
+        Element childElement = doc.createElement("nolink");
+        childElement.setTextContent("http://vk.com/wall113331570_2095");
+        parent.appendChild(childElement);
+
+        return doc;
+
+    }
+
     private SearcherDataTest(){}
 }
