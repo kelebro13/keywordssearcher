@@ -31,25 +31,33 @@ public class KeywordsSearcherApplication {
             if("exit".equals(path)) {
                 break;
             }
-            try {
-                Set<String> keywords = getKeywordsFromFile(path);
-                if (keywords.isEmpty()) {
-                    LOG.debug(String.format("Файл %s не содержит ключевых слов", path));
-                    ConsoleHelper.writeMessage("Файл не содержит ключевых слов. Выберите другой файл.");
-                    continue;
-                }
-                ConsoleHelper.writeMessage("Запуск поиска ссылов...");
-                Map<String, Integer> linksStatistic = YandexApiSearcher.getLinksStatistics(keywords);
-                if(linksStatistic.isEmpty()){
-                    LOG.debug(String.format("Ссылок по данным ключевым словам s не найдено.", keywords.toString()));
-                    ConsoleHelper.writeMessage("Ссылок по данным ключевым словам не найдено.");
+
+            if (Files.exists(Paths.get(path))) {
+                try {
+                    Set<String> keywords = getKeywordsFromFile(path);
+                    if (keywords.isEmpty()) {
+                        LOG.debug(String.format("Файл %s не содержит ключевых слов", path));
+                        ConsoleHelper.writeMessage("Файл не содержит ключевых слов. Выберите другой файл.");
+                        continue;
+                    }
+                    ConsoleHelper.writeMessage("Запуск поиска ссылов...");
+                    YandexApiSearcher searcher = new YandexApiSearcher();
+
+
+                    Map<String, Integer> linksStatistic = searcher.getLinksStatistics(keywords);
+                    if(linksStatistic.isEmpty()){
+                        LOG.debug(String.format("Ссылок по данным ключевым словам %s не найдено.", keywords.toString()));
+                        ConsoleHelper.writeMessage("Ссылок по данным ключевым словам не найдено.");
+                        break;
+                    }
+                    saveLinksStatistics(linksStatistic);
+                    ConsoleHelper.writeMessage("Поиск завершен.");
                     break;
+                } catch (Exception e) {
+                    ConsoleHelper.writeMessage(e.getMessage());
                 }
-                saveLinksStatistics(linksStatistic);
-                ConsoleHelper.writeMessage("Поиск завершен.");
-                break;
-            } catch (Exception e) {
-                ConsoleHelper.writeMessage(e.getMessage());
+            }else{
+                ConsoleHelper.writeMessage("Данного файла не существует!");
             }
             ConsoleHelper.writeMessage("Повторите операцию:");
         }
@@ -58,12 +66,12 @@ public class KeywordsSearcherApplication {
     public static Set<String> getKeywordsFromFile(String filePath) throws IOException, IllegalArgumentException {
 
         Charset charset = Charset.forName(new TikaEncodingDetector().guessEncoding(new FileInputStream(filePath)));
-        Set<String> keywordSet = Files.lines(Paths.get(filePath), charset).collect(Collectors.toCollection(HashSet::new));
-
-        if(!keywordSet.stream().allMatch(s -> s.matches(REGEXP))){
-            LOG.debug(String.format("Файл %s содержит неверные данные", filePath));
-            throw new IllegalArgumentException("Файл содержит неверные данные");
-        }
+        Set<String> keywordSet = Files.lines(Paths.get(filePath), charset).peek(s -> {
+            if (!s.matches(REGEXP)) {
+                LOG.debug("Неверные данные в строке: " + s);
+            }
+        }).filter(s -> s.matches(REGEXP)).peek(s -> ConsoleHelper.writeMessage("Добавлено ключевое слово: " + s))
+                .collect(Collectors.toCollection(HashSet::new));
         return keywordSet;
     }
 
