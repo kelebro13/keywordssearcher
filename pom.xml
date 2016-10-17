@@ -81,6 +81,7 @@
                 </executions>
                 <configuration>
                     <mainClass>ru.testim.KeywordsSearcherApplication</mainClass>
+                    <cleanupDaemonThreads>false</cleanupDaemonThreads>
                 </configuration>
             </plugin>
         </plugins>
