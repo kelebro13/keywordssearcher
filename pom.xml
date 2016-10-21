@@ -48,6 +48,15 @@
             <artifactId>apache-any23-encoding</artifactId>
             <version>${encodingdetect.version}</version>
         </dependency>
+        <!--CLI-->
+        <!-- https://mvnrepository.com/artifact/com.beust/jcommander -->
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.58</version>
+        </dependency>
+
+
         <!--Test-->
         <dependency>
             <groupId>junit</groupId>

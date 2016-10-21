@@ -2,6 +2,7 @@ package ru.testim;
 
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -34,6 +35,9 @@ public class YandexApiSearcher {
     private Queue<String> keywords = new ConcurrentLinkedQueue<>();
     private static Set<String> links = new CopyOnWriteArraySet<>(); // все ссылки по ключевым словам
 
+    private URL urlProxy;
+    private Integer portProxy;
+
     public Map<String, Integer> getLinksStatistics(Set<String> keywordsSet) throws IOException {
 
         keywords = keywordsSet.stream().collect(Collectors.toCollection(ConcurrentLinkedQueue::new)); // все ключевые слова
@@ -50,7 +54,7 @@ public class YandexApiSearcher {
         }
 
         service.shutdown();
-        while (!service.isShutdown()) {
+        while (!service.isTerminated()) {
             //wait
         }
         Map<String, Integer> linkStatistics = getLinksCount(links);
@@ -87,6 +91,22 @@ public class YandexApiSearcher {
         YandexApiSearcher.numdoc = numdoc;
     }
 
+    public URL getUrlProxy() {
+        return urlProxy;
+    }
+
+    public void setUrlProxy(URL urlProxy) {
+        this.urlProxy = urlProxy;
+    }
+
+    public Integer getPortProxy() {
+        return portProxy;
+    }
+
+    public void setPortProxy(Integer portProxy) {
+        this.portProxy = portProxy;
+    }
+
     public class LinkSearcher implements Callable {
 
 
@@ -97,6 +117,7 @@ public class YandexApiSearcher {
             ConsoleHelper.writeMessage("Поиск по слову: " + keyword);
             Document document = getDocument(keyword);
             links.addAll(getLinks(document));
+            ConsoleHelper.writeMessage("Поиск заверщен по слову: " + keyword);
             return links;
         }
 
@@ -105,7 +126,9 @@ public class YandexApiSearcher {
             String url = String.format(URL_FORMAT, keyword, numdoc);
             HttpClientBuilder clientBuilder = HttpClientBuilder.create();
             clientBuilder.disableCookieManagement();
-            // TODO: 17.10.2016 если есть прокси сервер - нужно настроить
+            if(urlProxy != null) {
+                clientBuilder.setProxy(new HttpHost(urlProxy.getHost(), portProxy));
+            }
             HttpClient client = clientBuilder.build();
             HttpUriRequest request = new HttpGet(url);
             HttpResponse response;
